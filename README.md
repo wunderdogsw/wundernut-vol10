@@ -81,9 +81,9 @@ Leader Of Litter, Cat At Top
 ## General rules:
 
 - You can use any programming language to solve the problem.
-- The solution must contain the right answer.
+- The solution must include the source to general Doggolang interpreter that can run any Doggolang code.\
+  Find and replace type of solution is not an answer we are looking for.
 - The winner will be the most elegant solution, decided by the Wundernut jury.
-- Performance is a part of elegance.
 - The participant gives Wunderdog the right to publish their source code used in the submitted solutions.
 - Submit your solution via the form in [here](https://wunder.dog/pahkina) by June 2nd 2019 2:00am.
 - The winner is chosen by our Wunderdog jury and he/she will be awarded with Withings Steel activity watch. The jury meets on the 7th of June.
