@@ -1,0 +1,12 @@
+[package]
+name = "wunder10"
+version = "1.0.0"
+authors = ["Henri Pirinen <pirinen.henri@gmail.com>"]
+edition = "2018"
+
+[build-dependencies]
+lalrpop = "0.17.0"
+
+[dependencies]
+lalrpop-util = "0.17.0"
+regex = "0.2.1"

@@ -1,0 +1,63 @@
+use std::str::FromStr;
+use crate::program as s;
+use crate::state::{Int};
+
+grammar;
+
+pub Program: s::Program = {
+    <statements: Statement+> <return_variable: Variable> => 
+        s::Program { 
+            statements: s::Statements { statements }, 
+            return_variable 
+        }
+};
+
+Statement: s::Statement = {
+    <variable: Variable> "AWOO" <expression: Expression> => 
+        s::Statement::Set { variable, expression },
+
+    "RUF?" <expression: ComparisonExpression> "VUH" <if_statements: Statement+> "ROWH" <else_statements:Statement+> "ARRUF" => 
+        s::Statement::If { 
+            expression, 
+            if_statements: s::Statements { statements: if_statements }, 
+            else_statements: s::Statements { statements: else_statements } 
+        },
+
+    "GRRR" <expression: ComparisonExpression> "BOW" <statements: Statement+> "BORF" => 
+        s::Statement::While { 
+            expression, 
+            statements: s::Statements { statements } 
+        }
+};
+
+Value: s::Value = {
+    <variable:Variable> => s::Value::Variable(variable),
+    <number:Number> => s::Value::Const(number)
+};
+
+Expression: s::Expression = {
+    <number:Number> => 
+        s::Expression::Const(number),
+
+    <left:Value> <operator:Operator> <right:Value> => 
+        s::Expression::Expression { left, right, operator }
+};
+
+Operator: s::Operator = {
+    "WOOF" => s::Operator::Add,
+    "BARK" => s::Operator::Substract,
+    "ARF" => s::Operator::Multiply
+};
+
+ComparisonExpression: s::ComparisonExpression = {
+    <left:Variable> <operator:ComparisonOperator> <right:Value> => 
+        s::ComparisonExpression { left, right, operator }
+};
+
+ComparisonOperator: s::ComparisonOperator = {
+    "YAP" => s::ComparisonOperator::GreaterThan,
+    "YIP" => s::ComparisonOperator::LessThan
+};
+
+Variable: String = <s:r"[a-z]+"> => s.to_string();
+Number: Int = <s:r"[0-9]+"> => Int::from_str(s).unwrap();
