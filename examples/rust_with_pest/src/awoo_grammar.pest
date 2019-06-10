@@ -1,0 +1,36 @@
+integer = @{ ("+" | "-")? ~ '0'..'9'+ }
+identifier = @{ ASCII_ALPHA_LOWER+ }
+
+statements = { statement+ }
+statement = { while_loop | var_definition | if_else | identifier }
+
+if_else = {if_start ~ statements ~ else_part ~ statements  ~ endif}
+    if_start = { "RUF?" ~ expression ~ logical_operation ~ expression ~ "VUH" }
+    else_part = { "ROWH" }
+    endif = {"ARRUF"}
+
+while_loop = {while_start ~ statements ~ while_end}
+    while_start = { "GRRR" ~ expression ~ logical_operation ~ expression ~ "BOW" }
+    while_end = _{ "BORF" }
+
+assign = _{ "AWOO" }
+
+expression = _{ binary_expr | unary_expr }
+    unary_expr = { operand }
+    binary_expr = { operand ~ operation ~ operand }
+
+operand = _{ identifier | integer }
+
+var_definition = { identifier ~ assign  ~ expression }
+
+operation = _{ add | sub | mul }
+    add = { "WOOF" }
+    sub = { "BARK" }
+    mul = { "ARF" }
+
+logical_operation = _{ less_than | greater_than }
+    less_than = { "YIP" }
+    greater_than = { "YAP" }
+
+WHITESPACE = _{ " " | "\t" | NEWLINE }
+
