@@ -1,0 +1,159 @@
+/*
+
+Cons:
+Whitespace is significant:
+  Requires consistent indentation.
+  Requires statements on separate lines.
+  Requires single spaces between tokens.
+No error handling or messages.
+"Redundant" keywords not checked.
+Crashes if "malformed" code.
+No features beyond example sources.
+No comments. Inner workings left as swift excercise.
+Probably not superfast for huge Doggolang code bases.
+
+Pros: Fairly compact?
+
+*/
+
+// ----------------------------------------------------------------
+// Solution
+
+import Foundation
+
+extension String {
+    var indentation: Index { return firstIndex() { !$0.isWhitespace } ?? startIndex }
+    var tokens: [String] { return self[indentation...].components(separatedBy: .whitespaces) }
+    
+    func runAsDoggolang() {
+        var lines = components(separatedBy: .newlines)
+        let main = DoggoExp(withLines: &lines, main: true)
+        var vars = [String:Int]()
+        main.execute(using: &vars)
+    }
+}
+
+class DoggoExp {
+    private var tokens = [String]()
+    private var exps = [DoggoExp]()
+    private var elseExps = [DoggoExp]()
+    
+    var isMain:  Bool { return tokens.count == 0 }
+    var isIf:    Bool { return tokens.first == "RUF?" }
+    var isWhile: Bool { return tokens.first == "GRRR" }
+    
+    init(withLines lines: inout [String], main: Bool = false) {
+        tokens = main ? [] : lines.removeFirst().tokens
+        if isMain || isIf || isWhile {
+            let ind = lines.first?.indentation
+            while ind == lines.first?.indentation {
+                exps.append(DoggoExp(withLines: &lines))
+            }
+            if isIf {
+                lines.removeFirst()
+                while ind == lines.first?.indentation {
+                    elseExps.append(DoggoExp(withLines: &lines))
+                }
+            }
+        }
+    }
+    
+    func execute(using vars: inout [String:Int]) {
+        
+        var comparisonHolds: Bool {
+            let v1 = vars[tokens[1]] ?? Int(tokens[1])!
+            let v2 = vars[tokens[3]] ?? Int(tokens[3])!
+            return tokens[2] == "YIP" ? v1 < v2
+                                      : v1 > v2
+        }
+        
+        var assignmentValue: Int {
+            let v1 = vars[tokens[2]] ?? Int(tokens[2])!
+            if tokens.count == 3 { return v1 }
+            let v2 = vars[tokens[4]] ?? Int(tokens[4])!
+            return tokens[3] == "WOOF" ? v1 + v2
+                 : tokens[3] == "BARK" ? v1 - v2
+                                       : v1 * v2
+        }
+        
+        if isMain || isIf {
+            (isMain || comparisonHolds ? exps : elseExps).forEach() { $0.execute(using: &vars) }
+        }
+        else if isWhile {
+            while comparisonHolds { exps.forEach() { $0.execute(using: &vars) } }
+        }
+        else if tokens.count > 1 {
+            vars[tokens.first!] = assignmentValue
+        }
+        else if let value = vars[tokens.first!] {
+            print(value)
+        }
+    }
+}
+
+// ----------------------------------------------------------------
+// Tests
+
+let 🦴 = """
+lassie AWOO 5
+luna AWOO 6
+bailey AWOO lassie WOOF luna
+bailey
+"""
+
+let 🍖 = """
+roi AWOO 5
+RUF? roi YAP 2 VUH
+    roi AWOO roi ARF 3
+ROWH
+    roi AWOO roi WOOF 100
+ARRUF
+roi
+"""
+
+let 🍗 = """
+roi AWOO 5
+RUF? roi YIP 2 VUH
+  roi AWOO roi ARF 3
+ROWH
+  roi AWOO roi WOOF 100
+ARRUF
+roi
+"""
+
+let 🥩 = """
+quark AWOO 6 BARK 2
+gromit AWOO 5
+milo AWOO 0
+GRRR milo YIP gromit BOW
+    quark AWOO quark WOOF 3
+    milo AWOO milo WOOF 1
+BORF
+quark
+"""
+
+let 🌭 = """
+samantha AWOO 1
+hooch AWOO 500
+einstein AWOO 10
+fuji AWOO 0
+GRRR fuji YIP hooch BOW
+    samantha AWOO samantha WOOF 3
+    RUF? samantha YAP 100 VUH
+      samantha AWOO samantha BARK 1
+    ROWH
+      einstein AWOO einstein WOOF 1
+      samantha AWOO samantha ARF einstein
+    ARRUF
+    fuji AWOO fuji WOOF 1
+BORF
+GRRR fuji YAP 0 BOW
+    samantha AWOO samantha WOOF 375
+    fuji AWOO fuji BARK 3
+BORF
+samantha
+"""
+
+for 🐶 in [🦴,🍖,🍗,🥩,🌭] {
+    🐶.runAsDoggolang()
+}
